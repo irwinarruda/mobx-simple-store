@@ -1,0 +1,34 @@
+{
+  "name": "mobx-simple-store",
+  "version": "1.1.0",
+  "description": "Mobx Simple Store (also MSS) is a wrapper around Mobx that helps the user create a reactive state tree store with an opinionated structure and setters that can read JSON objects.",
+  "author": "irwinarruda",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --minify --external react",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts --external react"
+  },
+  "keywords": [
+    "mobx",
+    "store",
+    "reactive",
+    "state",
+    "tree",
+    "json",
+    "object"
+  ],
+  "dependencies": {
+    "@types/node": "^18.11.18",
+    "typescript": "^4.9.3"
+  },
+  "peerDependencies": {
+    "mobx": ">=6"
+  },
+  "devDependencies": {
+    "mobx": "^6.7.0",
+    "tsup": "^6.5.0"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "mobx-simple-store",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "irwinarruda",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "mss": "pnpm -C packages/mobx-simple-store",
+    "sandbox": "pnpm -C packages/sandbox",
+    "dev": "concurrently \"pnpm mss dev\" \"pnpm sandbox dev\"",
+    "build": "pnpm mss build",
+    "deploy_package": "pnpm publish packages/mobx-simple-store --no-git-checks"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "packageManager": "pnpm@7.26.1"
+}
