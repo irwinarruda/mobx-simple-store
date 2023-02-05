@@ -4,9 +4,11 @@ import { hiddenKey } from "@utils/hiddenKey";
 import { safeAssign } from "@utils/safeAssign";
 import { isGenerator } from "@utils/isGenerator";
 import { isNullOrUndefined } from "@utils/isNullOrUndefined";
+import { mssError } from "@utils/mssError";
+import { joinPaths } from "@utils/joinPaths";
 
-import { ParseActions } from "@utils-types/ParseActions";
-import { ParseObservables } from "@utils-types/ParseObservables";
+import { ParseModel } from "@utils-types/ParseModel";
+import { ParseJSON } from "@utils-types/ParseJSON";
 import { SetObservableParams } from "@utils-types/SetObservableParams";
 
 import { MSSMaybeNull } from "./MSSMaybeNull";
@@ -29,6 +31,7 @@ export class MSSModel<
     this.currentObservables = initialObservables;
     this.currentViews = initialViews || ({} as Views);
     this.currentActions = {
+      ...initialActions,
       hydrate(data: any) {
         // Maybe change this to a more optimal way if there is problem with rendering
         for (let key of Object.keys(initialObservables as any)) {
@@ -36,29 +39,27 @@ export class MSSModel<
           (this as any)[key] = data[key];
         }
       },
-      ...initialActions,
     } as unknown as Actions;
   }
 
   public actions<T extends Record<string, any>>(
-    actionsList: T &
-      ThisType<ParseObservables<Observables> & Views & ParseActions<Actions>>
+    actionsList: T & ThisType<ParseModel<this>>
   ) {
     this.currentActions = { ...this.currentActions, ...actionsList };
     return this as unknown as MSSModel<Observables, Views, Actions & T>;
   }
 
   public views<T extends Record<string, any>>(
-    viewsList: T &
-      ThisType<ParseObservables<Observables> & Views & ParseActions<Actions>>
+    viewsList: T & ThisType<ParseModel<this>>
   ) {
     this.currentViews = safeAssign(this.currentViews, viewsList);
     return this as unknown as MSSModel<Observables, Views & T, Actions>;
   }
 
   public create(
-    initialData: ParseObservables<Observables>
-  ): ParseObservables<Observables> & Views & Actions {
+    initialData: ParseJSON<this>,
+    currentPath?: string
+  ): ParseModel<this> {
     const observableData = {} as any;
     const observableOptions = {} as any;
     for (let [name, instance] of Object.entries<any>(
@@ -72,6 +73,7 @@ export class MSSModel<
             instance: instance.child,
             initialValue: initialData[name],
             isNullable: true,
+            currentPath,
           });
           MSSModel.setObservableOptions(observableOptions, name);
         } else if (MSSArray.isArray(instance.child)) {
@@ -81,6 +83,7 @@ export class MSSModel<
             instance: instance.child,
             initialValue: initialData[name],
             isNullable: true,
+            currentPath,
           });
           MSSArray.setObservableOptions(observableOptions, name);
         } else {
@@ -89,7 +92,11 @@ export class MSSModel<
         }
       } else {
         if (isNullOrUndefined(initialData[name])) {
-          throw { message: `Missing initial data for ${name}` };
+          mssError({
+            message: `Missing initial data for property "${name}"`,
+            currentPath,
+            type: "warn",
+          });
         }
         if (MSSModel.isModel(instance)) {
           MSSModel.setObservable({
@@ -97,6 +104,7 @@ export class MSSModel<
             name,
             instance: instance,
             initialValue: initialData[name],
+            currentPath,
           });
           MSSModel.setObservableOptions(observableOptions, name);
         } else if (MSSArray.isArray(instance)) {
@@ -105,6 +113,7 @@ export class MSSModel<
             name,
             instance: instance,
             initialValue: initialData[name],
+            currentPath,
           });
           MSSArray.setObservableOptions(observableOptions, name);
         } else {
@@ -152,15 +161,17 @@ export class MSSModel<
     instance,
     initialValue,
     isNullable = false,
+    currentPath = "",
   }: SetObservableParams<MSSModel<any, any, any>>) {
+    const path = joinPaths(currentPath, name);
     if (!isNullable) {
-      observableData[hiddenKey(name)] = instance.create(initialValue);
+      observableData[hiddenKey(name)] = instance.create(initialValue, path);
       Object.defineProperty(observableData, name, {
         set(updatedData) {
           if (isNullOrUndefined(updatedData)) {
-            throw {
-              message: `Cannot sett undefined data. Try wrapping the model with types.maybeNull`,
-            };
+            mssError({
+              message: `Cannot set undefined data. Try wrapping the model with types.maybeNull`,
+            });
           }
           this[hiddenKey(name)].hydrate(updatedData);
         },
@@ -172,7 +183,7 @@ export class MSSModel<
       if (isNullOrUndefined(initialValue)) {
         observableData[hiddenKey(name)] = undefined;
       } else {
-        observableData[hiddenKey(name)] = instance.create(initialValue);
+        observableData[hiddenKey(name)] = instance.create(initialValue, path);
       }
       Object.defineProperty(observableData, name, {
         set(updatedData) {
@@ -180,7 +191,7 @@ export class MSSModel<
             this[hiddenKey(name)] = undefined;
           } else {
             if (isNullOrUndefined(this[hiddenKey(name)])) {
-              this[hiddenKey(name)] = instance.create(updatedData);
+              this[hiddenKey(name)] = instance.create(updatedData, path);
             } else {
               this[hiddenKey(name)].hydrate(updatedData);
             }

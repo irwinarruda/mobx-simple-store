@@ -118,7 +118,6 @@ export function compose(...models: any[]) {
     Object.assign(modelData.actions, actions);
     safeAssign(modelData.views, views);
   }
-  delete modelData.actions.hydrate;
   return new MSSModel(
     modelData.observables,
     modelData.views,

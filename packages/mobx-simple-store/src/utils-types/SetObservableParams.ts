@@ -4,4 +4,5 @@ export type SetObservableParams<T> = {
   instance: T;
   initialValue: any;
   isNullable?: boolean;
+  currentPath?: string;
 };

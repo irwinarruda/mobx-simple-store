@@ -1,10 +1,10 @@
+import { MSSModel } from "@models/MSSModel";
 import { MSSArray } from "@models/MSSArray";
 import { MSSMaybeNull } from "@models/MSSMaybeNull";
-import { MSSModel } from "@models/MSSModel";
 
 import { Nullable } from "./Nullable";
 
-export type ToJSON<T extends MSSModel<any, any, any>> = T extends MSSModel<
+export type ParseJSON<T extends MSSModel<any, any, any>> = T extends MSSModel<
   infer O,
   any,
   any
@@ -12,19 +12,19 @@ export type ToJSON<T extends MSSModel<any, any, any>> = T extends MSSModel<
   ? {
       // Model
       [K in keyof O]: O[K] extends MSSModel<any, any, any>
-        ? ToJSON<O[K]>
+        ? ParseJSON<O[K]>
         : // Array
         O[K] extends MSSArray<infer C>
         ? C extends MSSModel<any, any, any>
-          ? ToJSON<C>[]
+          ? ParseJSON<C>[]
           : C[]
         : // MaybeNull
         O[K] extends MSSMaybeNull<infer C>
         ? C extends MSSModel<any, any, any>
-          ? Nullable<ToJSON<C>>
+          ? Nullable<ParseJSON<C>>
           : C extends MSSArray<infer D>
           ? D extends MSSModel<any, any, any>
-            ? Nullable<ToJSON<D>>
+            ? Nullable<ParseJSON<D>>
             : Nullable<D[]>
           : Nullable<C>
         : // Normal Return

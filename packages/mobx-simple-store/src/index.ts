@@ -8,6 +8,7 @@ export * from "./utils/isNullOrUndefined";
 
 export * from "./utils-types/Nullable";
 export * from "./utils-types/ObservableArray";
-export * from "./utils-types/ToJSON";
 export * from "./utils-types/ParseObservables";
 export * from "./utils-types/ParseActions";
+export * from "./utils-types/ParseModel";
+export * from "./utils-types/ParseJSON";
