@@ -79,4 +79,4 @@ const useCounterStore = createStore({
 const counterStore = useCounterStore();
 ```
 
-Para mais exemplos, verifique o caminho `packages/sandbox`
+For more examples, check `packages/sandbox`
