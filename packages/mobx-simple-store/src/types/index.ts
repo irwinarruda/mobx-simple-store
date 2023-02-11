@@ -1,3 +1,5 @@
+import { constant } from "./constant";
+import { frozen } from "./frozen";
 import { array } from "./array";
 import { compose } from "./compose";
 import { maybeNull } from "./maybeNull";
@@ -8,6 +10,8 @@ export const types = {
   number: Number(),
   stringOrNumber: String() as number | string,
   boolean: Boolean(),
+  constant,
+  frozen,
   array,
   compose,
   maybeNull,

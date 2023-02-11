@@ -24,7 +24,7 @@ export type ParseJSON<T extends MSSModel<any, any, any>> = T extends MSSModel<
           ? Nullable<ParseJSON<C>>
           : C extends MSSArray<infer D>
           ? D extends MSSModel<any, any, any>
-            ? Nullable<ParseJSON<D>>
+            ? Nullable<ParseJSON<D>[]>
             : Nullable<D[]>
           : Nullable<C>
         : // Normal Return

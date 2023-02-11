@@ -2,48 +2,18 @@ import { MSSModel } from "@models/MSSModel";
 
 import { safeAssign } from "@utils/safeAssign";
 
-export function compose<
-  AA extends Record<string, any>,
-  AB extends Record<string, any>,
-  AC extends Record<string, any>,
-  BA extends Record<string, any>,
-  BB extends Record<string, any>,
-  BC extends Record<string, any>
->(
+export function compose<AA, AB, AC, BA, BB, BC>(
   model1: MSSModel<AA, AB, AC>,
   model2: MSSModel<BA, BB, BC>
 ): MSSModel<AA & BA, AB & BB, AC & BC>;
 
-export function compose<
-  AA extends Record<string, any>,
-  AB extends Record<string, any>,
-  AC extends Record<string, any>,
-  BA extends Record<string, any>,
-  BB extends Record<string, any>,
-  BC extends Record<string, any>,
-  CA extends Record<string, any>,
-  CB extends Record<string, any>,
-  CC extends Record<string, any>
->(
+export function compose<AA, AB, AC, BA, BB, BC, CA, CB, CC>(
   model1: MSSModel<AA, AB, AC>,
   model2: MSSModel<BA, BB, BC>,
   model3: MSSModel<CA, CB, CC>
 ): MSSModel<AA & BA & CA, AB & BB & CB, AC & BC & CC>;
 
-export function compose<
-  AA extends Record<string, any>,
-  AB extends Record<string, any>,
-  AC extends Record<string, any>,
-  BA extends Record<string, any>,
-  BB extends Record<string, any>,
-  BC extends Record<string, any>,
-  CA extends Record<string, any>,
-  CB extends Record<string, any>,
-  CC extends Record<string, any>,
-  DA extends Record<string, any>,
-  DB extends Record<string, any>,
-  DC extends Record<string, any>
->(
+export function compose<AA, AB, AC, BA, BB, BC, CA, CB, CC, DA, DB, DC>(
   model1: MSSModel<AA, AB, AC>,
   model2: MSSModel<BA, BB, BC>,
   model3: MSSModel<CA, CB, CC>,
@@ -51,21 +21,21 @@ export function compose<
 ): MSSModel<AA & BA & CA & DA, AB & BB & CB & DB, AC & BC & CC & DC>;
 
 export function compose<
-  AA extends Record<string, any>,
-  AB extends Record<string, any>,
-  AC extends Record<string, any>,
-  BA extends Record<string, any>,
-  BB extends Record<string, any>,
-  BC extends Record<string, any>,
-  CA extends Record<string, any>,
-  CB extends Record<string, any>,
-  CC extends Record<string, any>,
-  DA extends Record<string, any>,
-  DB extends Record<string, any>,
-  DC extends Record<string, any>,
-  EA extends Record<string, any>,
-  EB extends Record<string, any>,
-  EC extends Record<string, any>
+  AA,
+  AB,
+  AC,
+  BA,
+  BB,
+  BC,
+  CA,
+  CB,
+  CC,
+  DA,
+  DB,
+  DC,
+  EA,
+  EB,
+  EC
 >(
   model1: MSSModel<AA, AB, AC>,
   model2: MSSModel<BA, BB, BC>,
@@ -79,24 +49,24 @@ export function compose<
 >;
 
 export function compose<
-  AA extends Record<string, any>,
-  AB extends Record<string, any>,
-  AC extends Record<string, any>,
-  BA extends Record<string, any>,
-  BB extends Record<string, any>,
-  BC extends Record<string, any>,
-  CA extends Record<string, any>,
-  CB extends Record<string, any>,
-  CC extends Record<string, any>,
-  DA extends Record<string, any>,
-  DB extends Record<string, any>,
-  DC extends Record<string, any>,
-  EA extends Record<string, any>,
-  EB extends Record<string, any>,
-  EC extends Record<string, any>,
-  FA extends Record<string, any>,
-  FB extends Record<string, any>,
-  FC extends Record<string, any>
+  AA,
+  AB,
+  AC,
+  BA,
+  BB,
+  BC,
+  CA,
+  CB,
+  CC,
+  DA,
+  DB,
+  DC,
+  EA,
+  EB,
+  EC,
+  FA,
+  FB,
+  FC
 >(
   model1: MSSModel<AA, AB, AC>,
   model2: MSSModel<BA, BB, BC>,
