@@ -6,20 +6,20 @@ import { Nullable } from "./Nullable";
 
 type ToJSON<T> = {
   // Model
-  [K in keyof T]: T[K] extends MSSModel<any, any, any>
-    ? ToJSON<T[K]>
+  [K in keyof T]: T[K] extends MSSModel<infer O, any, any>
+    ? ToJSON<O>
     : // Array
     T[K] extends MSSArray<infer C>
-    ? C extends MSSModel<any, any, any>
-      ? ToJSON<C>[]
+    ? C extends MSSModel<infer O, any, any>
+      ? ToJSON<O>[]
       : C[]
     : // MaybeNull
     T[K] extends MSSMaybeNull<infer C>
-    ? C extends MSSModel<any, any, any>
-      ? Nullable<ToJSON<C>>
+    ? C extends MSSModel<infer O, any, any>
+      ? Nullable<ToJSON<O>>
       : C extends MSSArray<infer D>
-      ? D extends MSSModel<any, any, any>
-        ? Nullable<ToJSON<D>[]>
+      ? D extends MSSModel<infer O, any, any>
+        ? Nullable<ToJSON<O>[]>
         : Nullable<D[]>
       : Nullable<C>
     : // Normal Return
