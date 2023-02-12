@@ -15,7 +15,11 @@ import { MSSMaybeNull } from "./MSSMaybeNull";
 import { MSSArray } from "./MSSArray";
 import { MSSConstant } from "./MSSConstant";
 
-export class MSSModel<Observables, Views, Actions> {
+export class MSSModel<
+  Observables extends object,
+  Views extends object,
+  Actions extends object
+> {
   private currentObservables: Observables;
   private currentViews: Views;
   private currentActions: Actions;
@@ -29,10 +33,10 @@ export class MSSModel<Observables, Views, Actions> {
     this.currentViews = initialViews || ({} as Views);
     this.currentActions = {
       ...initialActions,
-      hydrate(data: any) {
+      _hydrate(data: any) {
         // Maybe change this to a more optimal way if there is problem with rendering
         for (const key of Object.keys(initialObservables as any)) {
-          // since I'm setting every value, the low order hydrate will allways be called
+          // since I'm setting every value, the low order _hydrate will allways be called
           (this as any)[key] = data[key];
         }
       },
@@ -51,7 +55,7 @@ export class MSSModel<Observables, Views, Actions> {
 
   public create(
     initialData: ParseJSON<this>,
-    currentPath?: string
+    currentPath = ""
   ): ParseModel<this> {
     const observableData = {} as any;
     const observableOptions = {} as any;
@@ -80,8 +84,12 @@ export class MSSModel<Observables, Views, Actions> {
           });
           MSSArray.setObservableOptions(observableOptions, name);
         } else if (MSSConstant.isConstant(instance.child)) {
-          observableData[name] = (initialData as any)[name];
-          observableOptions[name] = false;
+          MSSConstant.setObservable({
+            observableData,
+            name,
+            initialValue: (initialData as any)[name],
+          });
+          MSSConstant.setObservableOptions(observableOptions, name);
         } else {
           observableData[name] = (initialData as any)[name];
           observableOptions[name] = observable;
@@ -89,7 +97,7 @@ export class MSSModel<Observables, Views, Actions> {
       } else {
         if (isNullOrUndefined((initialData as any)[name])) {
           mssError({
-            message: `Missing initial data for property "${name}"`,
+            message: `Missing data for property "${name}"`,
             currentPath,
             type: "warn",
           });
@@ -113,8 +121,12 @@ export class MSSModel<Observables, Views, Actions> {
           });
           MSSArray.setObservableOptions(observableOptions, name);
         } else if (MSSConstant.isConstant(instance)) {
-          observableData[name] = (initialData as any)[name];
-          observableOptions[name] = false;
+          MSSConstant.setObservable({
+            observableData,
+            name,
+            initialValue: (initialData as any)[name],
+          });
+          MSSConstant.setObservableOptions(observableOptions, name);
         } else {
           observableData[name] = (initialData as any)[name];
           observableOptions[name] = observable;
@@ -164,7 +176,7 @@ export class MSSModel<Observables, Views, Actions> {
   }: SetObservableParams<MSSModel<any, any, any>>) {
     const path = joinPaths(currentPath, name);
     if (!isNullable) {
-      observableData[hiddenKey(name)] = instance.create(initialValue, path);
+      observableData[hiddenKey(name)] = instance!.create(initialValue, path);
       Object.defineProperty(observableData, name, {
         set(updatedData) {
           if (isNullOrUndefined(updatedData)) {
@@ -173,7 +185,7 @@ export class MSSModel<Observables, Views, Actions> {
                 "Cannot set undefined data. Try wrapping the model with types.maybeNull",
             });
           }
-          this[hiddenKey(name)].hydrate(updatedData);
+          this[hiddenKey(name)]._hydrate(updatedData);
         },
         get() {
           return this[hiddenKey(name)];
@@ -183,7 +195,7 @@ export class MSSModel<Observables, Views, Actions> {
       if (isNullOrUndefined(initialValue)) {
         observableData[hiddenKey(name)] = undefined;
       } else {
-        observableData[hiddenKey(name)] = instance.create(initialValue, path);
+        observableData[hiddenKey(name)] = instance!.create(initialValue, path);
       }
       Object.defineProperty(observableData, name, {
         set(updatedData) {
@@ -191,9 +203,9 @@ export class MSSModel<Observables, Views, Actions> {
             this[hiddenKey(name)] = undefined;
           } else {
             if (isNullOrUndefined(this[hiddenKey(name)])) {
-              this[hiddenKey(name)] = instance.create(updatedData, path);
+              this[hiddenKey(name)] = instance!.create(updatedData, path);
             } else {
-              this[hiddenKey(name)].hydrate(updatedData);
+              this[hiddenKey(name)]._hydrate(updatedData);
             }
           }
         },
@@ -204,8 +216,8 @@ export class MSSModel<Observables, Views, Actions> {
     }
   }
 
-  public static setObservableOptions(observableOptions: any, key: string) {
-    observableOptions[key] = false;
-    observableOptions[hiddenKey(key)] = observable;
+  public static setObservableOptions(observableOptions: any, name: string) {
+    observableOptions[name] = false;
+    observableOptions[hiddenKey(name)] = observable;
   }
 }

@@ -1,7 +1,7 @@
 export type SetObservableParams<T> = {
   observableData: any;
   name: string;
-  instance: T;
+  instance?: T;
   initialValue: any;
   isNullable?: boolean;
   currentPath?: string;

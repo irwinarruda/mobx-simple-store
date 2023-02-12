@@ -24,15 +24,15 @@ export class MSSArray<Child> {
     ) {
       mssError({
         message:
-          "MSSArray cannot have a child of type MSSMaybeNull that has a child of type MSSMaybeNull or MSSArray",
+          "types.array cannot have a child types.maybeNull that has a child types.maybeNull or types.array",
       });
     }
     if (MSSArray.isArray(child)) {
-      mssError({ message: "MSSArray cannot have a child of type MSSArray" });
+      mssError({ message: "types.array cannot have a child types.array" });
     }
   }
 
-  create(initialData: Child[], currentPath?: string) {
+  create(initialData: Child[], currentPath = "") {
     if (
       MSSModel.isModel(this.child) ||
       MSSMaybeNull.isMaybeNullWithModel(this.child)
@@ -42,7 +42,7 @@ export class MSSArray<Child> {
     return observable.array(initialData, { deep: false });
   }
 
-  public createProxiedModelArray(initialData: any[], currentPath?: string) {
+  public createProxiedModelArray(initialData: any[], currentPath: string) {
     return new Proxy<any[]>(
       observable.array(this.parseReadablesToModels(initialData, currentPath), {
         deep: false,
@@ -79,10 +79,11 @@ export class MSSArray<Child> {
         },
         set: (target: any, prop, value) => {
           if (target[prop]) {
-            target[prop].replace(value);
+            target[prop]._hydrate(value);
           } else {
-            target[prop] = (this.child as MSSArray<any>).create(
-              this.parseReadablesToModels(value, currentPath)
+            target[prop] = (this.child as MSSModel<any, any, any>).create(
+              value,
+              currentPath
             );
           }
           return value;
@@ -91,7 +92,7 @@ export class MSSArray<Child> {
     );
   }
 
-  public parseReadablesToModels(readables: any[], currentPath?: string) {
+  public parseReadablesToModels(readables: any[], currentPath: string) {
     let instance =
       (this.child as MSSModel<any, any, any>) ||
       (this.child as MSSMaybeNull<MSSModel<any, any, any>>).child;
@@ -101,7 +102,7 @@ export class MSSArray<Child> {
         observableValues.push(undefined);
       } else {
         observableValues.push(
-          instance.create(readables[index], currentPath + `[${index}]`)
+          instance.create(readables[index], joinPaths(currentPath, index))
         );
       }
     }
@@ -122,7 +123,7 @@ export class MSSArray<Child> {
   }: SetObservableParams<MSSArray<any>>) {
     const path = joinPaths(currentPath, name);
     if (!isNullable) {
-      observableData[hiddenKey(name)] = instance.create(initialValue, path);
+      observableData[hiddenKey(name)] = instance!.create(initialValue, path);
       Object.defineProperty(observableData, name, {
         set(updatedData) {
           if (isNullOrUndefined(updatedData)) {
@@ -140,7 +141,7 @@ export class MSSArray<Child> {
       if (isNullOrUndefined(initialValue)) {
         observableData[hiddenKey(name)] = undefined;
       } else {
-        observableData[hiddenKey(name)] = instance.create(initialValue, path);
+        observableData[hiddenKey(name)] = instance!.create(initialValue, path);
       }
       Object.defineProperty(observableData, name, {
         set(updatedData) {
@@ -148,7 +149,7 @@ export class MSSArray<Child> {
             this[hiddenKey(name)] = undefined;
           } else {
             if (isNullOrUndefined(this[hiddenKey(name)])) {
-              this[hiddenKey(name)] = instance.create(updatedData, path);
+              this[hiddenKey(name)] = instance!.create(updatedData, path);
             } else {
               this[hiddenKey(name)].replace(updatedData);
             }

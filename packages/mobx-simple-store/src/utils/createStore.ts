@@ -17,7 +17,7 @@ export function createStore<T extends MSSModel<any, any, any>>({
   let _store: ParseModel<T>;
   return () => {
     if (!_store) {
-      _store = model.create(initialData);
+      _store = model.create(initialData, windowPropertyName || ".");
       if (windowPropertyName && typeof window !== "undefined") {
         (window as any)[windowPropertyName] = _store;
       }
