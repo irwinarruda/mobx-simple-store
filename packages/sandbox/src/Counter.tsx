@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { toGenerator, types, createStore } from "mobx-simple-store";
+import { toGenerator, types, createStore, safeAssign } from "mobx-simple-store";
 import { types as mstTypes } from "mobx-state-tree";
 
 import reactLogo from "./assets/react.svg";
@@ -88,6 +88,11 @@ const CounterStore = types
     })
   )
   .views({
+    get filteredCountArr() {
+      return this.countArr?.map((x) =>
+        safeAssign(x, { alterCount: x.count * 2 })
+      );
+    },
     get sumCount() {
       return this.count1 + this.count2;
     },
@@ -314,21 +319,20 @@ export const Counter = observer(({}: CounterProps) => {
       <div>
         <img src={reactLogo} className="logo react" alt="React logo" />
       </div>
-      {counterStore.countArr &&
-        counterStore.countArr.map(
-          (num: { count: any; incrementCount: any }, index: any) => (
-            <div key={index}>
-              {num.count}{" "}
-              <button
-                onClick={() => {
-                  num.incrementCount();
-                }}
-              >
-                Increment
-              </button>
-            </div>
-          )
-        )}
+      {counterStore.filteredCountArr &&
+        counterStore.filteredCountArr.map((num, index) => (
+          <div key={index}>
+            {num.count}{" "}
+            <button
+              onClick={() => {
+                num.incrementCount();
+              }}
+            >
+              Increment
+            </button>
+            {num.alterCount}{" "}
+          </div>
+        ))}
       <SumCounter />
       <Counter1 />
       <Counter2 />

@@ -4,6 +4,7 @@ export * from "./utils/cast";
 export * from "./utils/createStore";
 export * from "./utils/toGenerator";
 export * from "./utils/isNullOrUndefined";
+export * from "./utils/safeAssign";
 
 export * from "./utils-types/Nullable";
 export * from "./utils-types/ObservableArray";
