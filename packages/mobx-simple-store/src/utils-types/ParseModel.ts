@@ -14,7 +14,7 @@ type ToModel<T> = {
     : // Array
     T[P] extends MSSArray<infer C>
     ? C extends MSSModel<infer O, infer V, infer A>
-      ? ObservableArray<ToModel<O & V & ParseActions<A>>, O>
+      ? ObservableArray<ToModel<O & V & ParseActions<A>>, ToModel<O>>
       : ObservableArray<C>
     : // MaybeNul
     T[P] extends MSSMaybeNull<infer C>
@@ -22,7 +22,9 @@ type ToModel<T> = {
       ? Nullable<ToModel<O & V & ParseActions<A>>>
       : C extends MSSArray<infer D>
       ? D extends MSSModel<infer O, infer V, infer A>
-        ? Nullable<ObservableArray<ToModel<O & V & ParseActions<A>>, O>>
+        ? Nullable<
+            ObservableArray<ToModel<O & V & ParseActions<A>>, ToModel<O>>
+          >
         : Nullable<ObservableArray<D>>
       : Nullable<C>
     : // Normal Return

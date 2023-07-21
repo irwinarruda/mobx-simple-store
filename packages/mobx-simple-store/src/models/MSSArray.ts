@@ -78,7 +78,7 @@ export class MSSArray<Child> {
           return target[prop];
         },
         set: (target: any, prop, value) => {
-          if (target[prop]) {
+          if (!isNullOrUndefined(target[prop])) {
             target[prop]._hydrate(value);
           } else {
             target[prop] = (this.child as MSSModel<any, any, any>).create(

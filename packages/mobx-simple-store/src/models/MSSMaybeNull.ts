@@ -20,6 +20,6 @@ export class MSSMaybeNull<Child> {
   }
 
   public static isMaybeNullWithMaybeNull(value: any) {
-    return value instanceof MSSMaybeNull && MSSModel.isModel(value.child);
+    return value instanceof MSSMaybeNull && this.isMaybeNull(value.child);
   }
 }
