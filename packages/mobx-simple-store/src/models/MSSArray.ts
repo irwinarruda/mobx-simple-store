@@ -10,14 +10,14 @@ import { joinPaths } from "@utils/joinPaths";
 import { MSSMaybeNull } from "./MSSMaybeNull";
 import { MSSModel } from "./MSSModel";
 
-export class MSSArray<Ehild> {
-  public child: Ehild;
-  constructor(child: Ehild) {
+export class MSSArray<Child> {
+  public child: Child;
+  constructor(child: Child) {
     this.validateChild(child);
     this.child = child;
   }
 
-  public validateChild(child: Ehild) {
+  public validateChild(child: Child) {
     if (
       MSSMaybeNull.isMaybeNullWithArray(child) ||
       MSSMaybeNull.isMaybeNullWithMaybeNull(child)
@@ -32,7 +32,7 @@ export class MSSArray<Ehild> {
     }
   }
 
-  create(initialData: Ehild[], currentPath = "") {
+  create(initialData: Child[], currentPath = "") {
     if (
       MSSModel.isModel(this.child) ||
       MSSMaybeNull.isMaybeNullWithModel(this.child)
