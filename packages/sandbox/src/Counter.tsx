@@ -1,7 +1,13 @@
-import React from "react";
 import { observer } from "mobx-react-lite";
-import { toGenerator, types, createStore, safeAssign } from "mobx-simple-store";
+import {
+  createStore,
+  ParseJSON,
+  safeAssign,
+  toGenerator,
+  types,
+} from "mobx-simple-store";
 import { types as mstTypes } from "mobx-state-tree";
+import React from "react";
 
 import reactLogo from "./assets/react.svg";
 import "./Counter.css";
@@ -84,7 +90,9 @@ const CounterStore = types
       count2: types.number,
       countSub: types.maybeNull(CounterSubStore),
       countArr: types.maybeNull(types.array(CounterArrStore)),
-      countD: types.array(types.stringOrNumber),
+      countD: types.array(types.number),
+      countE: types.array(types.model({ count: types.number })),
+      anotherOne: types.model({ count: types.number }),
     })
   )
   .views({
@@ -129,9 +137,9 @@ const useCounterStore = createStore({
     count1: 0,
     count2: 0,
     loading: false,
-    countArr: undefined,
-    countSub: undefined,
+    anotherOne: { count: 123 },
     countD: [],
+    countE: [],
   },
   windowPropertyName: "counterStore",
 });
