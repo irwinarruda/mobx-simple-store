@@ -1,7 +1,13 @@
-import React from "react";
 import { observer } from "mobx-react-lite";
-import { toGenerator, types, createStore, safeAssign } from "mobx-simple-store";
+import {
+  createStore,
+  ParseJSON,
+  safeAssign,
+  toGenerator,
+  types,
+} from "mobx-simple-store";
 import { types as mstTypes } from "mobx-state-tree";
+import React from "react";
 
 import reactLogo from "./assets/react.svg";
 import "./Counter.css";
@@ -122,6 +128,11 @@ const CounterStore = types
       this.countSub = data;
     },
   });
+
+type CounterStoreType = ParseJSON<typeof CounterStore>;
+const obj: CounterStoreType = {
+  count1: 0,
+};
 
 const useCounterStore = createStore({
   model: CounterStore,
