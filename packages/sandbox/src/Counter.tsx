@@ -90,7 +90,9 @@ const CounterStore = types
       count2: types.number,
       countSub: types.maybeNull(CounterSubStore),
       countArr: types.maybeNull(types.array(CounterArrStore)),
-      countD: types.array(types.stringOrNumber),
+      countD: types.array(types.number),
+      countE: types.array(types.model({ count: types.number })),
+      anotherOne: types.model({ count: types.number }),
     })
   )
   .views({
@@ -129,20 +131,15 @@ const CounterStore = types
     },
   });
 
-type CounterStoreType = ParseJSON<typeof CounterStore>;
-const obj: CounterStoreType = {
-  count1: 0,
-};
-
 const useCounterStore = createStore({
   model: CounterStore,
   initialData: {
     count1: 0,
     count2: 0,
     loading: false,
-    countArr: undefined,
-    countSub: undefined,
+    anotherOne: { count: 123 },
     countD: [],
+    countE: [],
   },
   windowPropertyName: "counterStore",
 });
