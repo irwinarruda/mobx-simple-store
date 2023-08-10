@@ -1,5 +1,4 @@
 import { MSSModel } from "@models/MSSModel";
-
 import { safeAssign } from "@utils/safeAssign";
 
 export function compose<

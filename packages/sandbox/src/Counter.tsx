@@ -1,11 +1,5 @@
 import { observer } from "mobx-react-lite";
-import {
-  createStore,
-  ParseJSON,
-  safeAssign,
-  toGenerator,
-  types,
-} from "mobx-simple-store";
+import { createStore, safeAssign, toGenerator, types } from "mobx-simple-store";
 import { types as mstTypes } from "mobx-state-tree";
 import React from "react";
 
@@ -145,6 +139,10 @@ const useCounterStore = createStore({
 });
 
 const counterStore = useCounterStore();
+counterStore.asyncIncrementCount();
+counterStore.count1;
+counterStore.countSub!.countSub!.sumCount;
+counterStore.countSub!.countSub!.incrementCount5();
 
 const testPerformance = () => {
   console.time("Normal");

@@ -1,7 +1,7 @@
-import { constant } from "./constant";
-import { frozen } from "./frozen";
 import { array } from "./array";
 import { compose } from "./compose";
+import { constant } from "./constant";
+import { frozen } from "./frozen";
 import { maybeNull } from "./maybeNull";
 import { model } from "./model";
 

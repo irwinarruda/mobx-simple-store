@@ -1,19 +1,17 @@
 import { action, computed, flow, makeObservable, observable } from "mobx";
 
+import { ParseJSON } from "@utils-types/ParseJSON";
+import { ParseModel } from "@utils-types/ParseModel";
+import { SetObservableParams } from "@utils-types/SetObservableParams";
 import { hiddenKey } from "@utils/hiddenKey";
-import { safeAssign } from "@utils/safeAssign";
 import { isGenerator } from "@utils/isGenerator";
 import { isNullOrUndefined } from "@utils/isNullOrUndefined";
-import { mssError } from "@utils/mssError";
 import { joinPaths } from "@utils/joinPaths";
-
-import { ParseModel } from "@utils-types/ParseModel";
-import { ParseJSON } from "@utils-types/ParseJSON";
-import { SetObservableParams } from "@utils-types/SetObservableParams";
-
-import { MSSMaybeNull } from "./MSSMaybeNull";
+import { mssError } from "@utils/mssError";
+import { safeAssign } from "@utils/safeAssign";
 import { MSSArray } from "./MSSArray";
 import { MSSConstant } from "./MSSConstant";
+import { MSSMaybeNull } from "./MSSMaybeNull";
 
 export class MSSModel<
   Observables extends object,

@@ -1,9 +1,8 @@
 import { MSSArray } from "@models/MSSArray";
 import { MSSMaybeNull } from "@models/MSSMaybeNull";
 import { MSSModel } from "@models/MSSModel";
-
-import { Nullable } from "./Nullable";
 import { NotNullableKeys } from "./NotNullableKeys";
+import { Nullable } from "./Nullable";
 import { NullableKeys } from "./NullableKeys";
 
 type ToJSON<T> = {
