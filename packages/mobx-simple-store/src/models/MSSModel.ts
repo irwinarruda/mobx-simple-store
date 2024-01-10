@@ -16,7 +16,7 @@ import { MSSMaybeNull } from "./MSSMaybeNull";
 export class MSSModel<
   Observables extends object,
   Views extends object,
-  Actions extends object
+  Actions extends object,
 > {
   private currentObservables: Observables;
   private currentViews: Views;
@@ -25,17 +25,28 @@ export class MSSModel<
   constructor(
     initialObservables: Observables,
     initialViews?: Views,
-    initialActions?: Actions
+    initialActions?: Actions,
   ) {
     this.currentObservables = initialObservables;
     this.currentViews = initialViews || ({} as Views);
     this.currentActions = {
       ...initialActions,
+      toJS() {
+        const self = this as any;
+        const data = {} as ParseJSON<MSSModel<Observables, any, any>>;
+        for (const key of Object.keys(initialObservables as any)) {
+          data[key as keyof typeof data] = !isNullOrUndefined(self[key]?.toJS)
+            ? self[key].toJS()
+            : self[key];
+        }
+        return data;
+      },
       _hydrate(data: any) {
+        const self = this as any;
         // Maybe change this to a more optimal way if there is problem with rendering
         for (const key of Object.keys(initialObservables as any)) {
           // since I'm setting every value, the low order _hydrate will allways be called
-          (this as any)[key] = data[key];
+          self[key] = data[key];
         }
       },
     } as unknown as Actions;
@@ -53,12 +64,12 @@ export class MSSModel<
 
   public create(
     initialData: ParseJSON<this>,
-    currentPath = ""
+    currentPath = "",
   ): ParseModel<this> {
     const observableData = {} as any;
     const observableOptions = {} as any;
     for (const [name, instance] of Object.entries<any>(
-      this.currentObservables as Record<string, any>
+      this.currentObservables as Record<string, any>,
     )) {
       if (MSSMaybeNull.isMaybeNull(instance)) {
         if (MSSModel.isModel(instance.child)) {
@@ -143,7 +154,7 @@ export class MSSModel<
 
     Object.defineProperties(
       observableData,
-      Object.getOwnPropertyDescriptors(this.currentViews)
+      Object.getOwnPropertyDescriptors(this.currentViews),
     );
     for (const key of Object.keys(this.currentViews as Record<string, any>)) {
       observableOptions[key] = computed;

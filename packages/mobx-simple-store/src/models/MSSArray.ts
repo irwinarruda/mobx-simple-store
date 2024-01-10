@@ -37,7 +37,17 @@ export class MSSArray<Child> {
     ) {
       return this.createProxiedModelArray(initialData, currentPath);
     }
-    return observable.array(initialData, { deep: false });
+    return Object.defineProperty(
+      observable.array(initialData, { deep: false }),
+      "toJS",
+      {
+        value() {
+          const arr = [];
+          for (let item of this) arr.push(item);
+          return arr;
+        },
+      },
+    );
   }
 
   public createProxiedModelArray(initialData: any[], currentPath: string) {
@@ -47,6 +57,14 @@ export class MSSArray<Child> {
       }),
       {
         get: (target: any, prop) => {
+          if (prop === "toJS") {
+            return () => {
+              const arr = [];
+              for (let item of target)
+                arr.push(!isNullOrUndefined(item?.toJS) ? item.toJS() : item);
+              return arr;
+            };
+          }
           if (prop === "replace") {
             return (value: any[]) =>
               target.replace(this.parseReadablesToModels(value, currentPath));
@@ -54,7 +72,7 @@ export class MSSArray<Child> {
           if (prop === "unshift") {
             return (...value: any) =>
               target.unshift(
-                ...this.parseReadablesToModels(value, currentPath)
+                ...this.parseReadablesToModels(value, currentPath),
               );
           }
           if (prop === "push") {
@@ -70,7 +88,7 @@ export class MSSArray<Child> {
               target.splice(
                 start,
                 deleteCount,
-                ...this.parseReadablesToModels(value, currentPath)
+                ...this.parseReadablesToModels(value, currentPath),
               );
           }
           return target[prop];
@@ -81,12 +99,12 @@ export class MSSArray<Child> {
           } else {
             target[prop] = (this.child as MSSModel<any, any, any>).create(
               value,
-              currentPath
+              currentPath,
             );
           }
           return value;
         },
-      }
+      },
     );
   }
 
@@ -100,7 +118,7 @@ export class MSSArray<Child> {
         observableValues.push(undefined);
       } else {
         observableValues.push(
-          instance.create(readables[index], joinPaths(currentPath, index))
+          instance.create(readables[index], joinPaths(currentPath, index)),
         );
       }
     }

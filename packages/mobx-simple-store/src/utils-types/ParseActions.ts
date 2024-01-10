@@ -1,7 +1,9 @@
-export type ParseActions<T> = {
-  [P in keyof T]: T[P] extends (
+export type ParseActions<A, J> = {
+  [P in keyof A]: A[P] extends (
     ...args: infer A
   ) => Generator<Promise<any>, infer R, any>
     ? (...args: A) => Promise<R>
-    : T[P];
+    : A[P];
+} & {
+  toJS: () => J;
 };

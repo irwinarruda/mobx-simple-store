@@ -86,13 +86,13 @@ const CounterStore = types
       countArr: types.maybeNull(types.array(CounterArrStore)),
       countD: types.array(types.number),
       countE: types.array(types.model({ count: types.number })),
-      anotherOne: types.model({ count: types.number }),
-    })
+      anotherOne: types.model({ count: types.number }).actions({ test() {} }),
+    }),
   )
   .views({
     get filteredCountArr() {
       return this.countArr?.map((x) =>
-        safeAssign(x, { alterCount: x.count * 2 })
+        safeAssign(x, { alterCount: x.count * 2 }),
       );
     },
     get sumCount() {
@@ -140,9 +140,6 @@ const useCounterStore = createStore({
 
 const counterStore = useCounterStore();
 counterStore.asyncIncrementCount();
-counterStore.count1;
-counterStore.countSub!.countSub!.sumCount;
-counterStore.countSub!.countSub!.incrementCount5();
 
 const testPerformance = () => {
   console.time("Normal");
@@ -153,15 +150,25 @@ const testPerformance = () => {
     countSub: { count5: 11, count6: 11 },
   });
   console.timeEnd("Normal");
+  console.log(counterStore.toJS());
 };
 
 const MSSPerformanceTest = types
   .model({
     items: types.maybeNull(types.array(types.string)),
+    testCounterArr: types.array(CounterStore),
   })
   .actions({
     setItems(items: any[]) {
       this.items = items;
+      this.testCounterArr.push({
+        count1: 0,
+        count2: 0,
+        loading: false,
+        anotherOne: { count: 123 },
+        countD: [],
+        countE: [],
+      });
     },
   });
 const MSTerformanceTest = mstTypes
@@ -178,6 +185,16 @@ const usePerformanceTestStore = createStore({
   model: MSSPerformanceTest,
   initialData: {
     items: undefined,
+    testCounterArr: [
+      {
+        count1: 0,
+        count2: 0,
+        loading: false,
+        anotherOne: { count: 123 },
+        countD: [],
+        countE: [],
+      },
+    ],
   },
   windowPropertyName: "performanceTestStore",
 });
