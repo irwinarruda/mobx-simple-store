@@ -1,16 +1,8 @@
-import { types, ParseJSON } from "../src";
+import { types } from "../src";
 
-const model = types.model({
-  bar1: types
-    .model({ baz: types.string })
-    .views({
-      get test() {
-        return this.baz + "!";
-      },
-    })
-    .actions({ runTest() {} }),
-  bar2: types.maybeNull(
-    types
+const model = types
+  .model({
+    bar1: types
       .model({ baz: types.string })
       .views({
         get test() {
@@ -18,23 +10,7 @@ const model = types.model({
         },
       })
       .actions({ runTest() {} }),
-  ),
-  foo1: types.array(types.string),
-  foo2: types.array(
-    types
-      .model({
-        baz: types.string,
-        bar: types.model({ baz: types.boolean }).actions({ test() {} }),
-      })
-      .views({
-        get test() {
-          return this.baz + "!";
-        },
-      })
-      .actions({ runTest() {} }),
-  ),
-  foo3: types.maybeNull(
-    types.array(
+    bar2: types.maybeNull(
       types
         .model({ baz: types.string })
         .views({
@@ -44,19 +20,53 @@ const model = types.model({
         })
         .actions({ runTest() {} }),
     ),
-  ),
-});
+    foo1: types.array(types.string),
+    foo2: types.array(
+      types
+        .model({
+          baz: types.string,
+          bar: types.model({ baz: types.boolean }).actions({ test() {} }),
+        })
+        .views({
+          get test() {
+            return this.baz + "!!";
+          },
+        })
+        .actions({ runTest() {} }),
+    ),
+    foo3: types.maybeNull(
+      types.array(
+        types
+          .model({ baz: types.string })
+          .views({
+            get test() {
+              return this.baz + "!";
+            },
+          })
+          .actions({ runTest() {} }),
+      ),
+    ),
+  })
+  .views({
+    get test() {
+      return this.foo1.length;
+    },
+  });
 
-function createModelData(
-  initial?: Partial<ParseJSON<typeof model>>,
-): ParseJSON<typeof model> {
+function createModelData(addition?: any) {
   return {
-    ...initial,
-    bar1: { baz: "baz" },
-    bar2: { baz: "baz" },
-    foo1: ["foo1"],
-    foo2: [{ baz: "baz", bar: { baz: true } }],
-    foo3: [{ baz: "baz" }],
+    ...addition,
+    bar1: { baz: "baz", ...addition?.bar1 },
+    bar2: { baz: "baz", ...addition?.bar2 },
+    foo1: ["foo1", ...(addition?.foo1 ?? [])],
+    foo2: [
+      {
+        baz: "baz",
+        bar: { baz: true },
+        ...addition?.foo2?.[0],
+      },
+    ],
+    foo3: [{ baz: "baz", ...addition?.foo3?.[0] }],
   };
 }
 
@@ -90,5 +100,17 @@ describe("toJS", () => {
   test("toJS in the root.foo2 must return the sabe object as created", () => {
     const store = model.create(createModelData());
     expect(store.foo2.toJS!()).toStrictEqual(createModelData().foo2);
+  });
+  test("toJS in the root must return the same object as created with the includeViews option", () => {
+    const modelData = createModelData({
+      bar1: { test: "baz!" },
+      bar2: { test: "baz!" },
+      foo1: ["any"],
+      foo2: [{ test: "baz!!" }],
+      foo3: [{ test: "baz!" }],
+      test: 2,
+    });
+    const store = model.create(modelData);
+    expect(store.toJS({ includeViews: true })).toStrictEqual(modelData);
   });
 });

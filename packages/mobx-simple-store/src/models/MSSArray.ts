@@ -58,10 +58,12 @@ export class MSSArray<Child> {
       {
         get: (target: any, prop) => {
           if (prop === "toJS") {
-            return () => {
+            return (args: any) => {
               const arr = [];
               for (let item of target)
-                arr.push(!isNullOrUndefined(item?.toJS) ? item.toJS() : item);
+                arr.push(
+                  !isNullOrUndefined(item?.toJS) ? item.toJS(args) : item,
+                );
               return arr;
             };
           }

@@ -29,15 +29,25 @@ export class MSSModel<
   ) {
     this.currentObservables = initialObservables;
     this.currentViews = initialViews || ({} as Views);
+    const currentViewsClosure = this.currentViews;
     this.currentActions = {
       ...initialActions,
-      toJS() {
+      toJS(args?: { includeViews?: boolean }) {
         const self = this as any;
         const data = {} as ParseJSON<MSSModel<Observables, any, any>>;
         for (const key of Object.keys(initialObservables as any)) {
           data[key as keyof typeof data] = !isNullOrUndefined(self[key]?.toJS)
-            ? self[key].toJS()
+            ? self[key].toJS(args)
             : self[key];
+        }
+        if (
+          !isNullOrUndefined(currentViewsClosure) &&
+          !isNullOrUndefined(args) &&
+          args!.includeViews
+        ) {
+          for (const key of Object.keys(currentViewsClosure as any)) {
+            data[key as keyof typeof data] = self[key];
+          }
         }
         return data;
       },
