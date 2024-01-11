@@ -1,6 +1,7 @@
 import { MSSArray } from "@models/MSSArray";
 import { MSSMaybeNull } from "@models/MSSMaybeNull";
 import { MSSModel } from "@models/MSSModel";
+import { FixArgType } from "./FixArgType";
 import { NotNullableKeys } from "./NotNullableKeys";
 import { Nullable } from "./Nullable";
 import { NullableKeys } from "./NullableKeys";
@@ -21,15 +22,11 @@ export type ToModel<T> = Pick<
           : C extends MSSMaybeNull<infer D> // Array of MaybeNull
             ? D extends MSSModel<infer E, infer EV, infer EA> // Array of MaybeNull of Model
               ? ObservableArray<
-                  Nullable<
-                    ObservableArray<
-                      ToModel<E & EV & ParseActions<EA, ToJSON<E>>>,
-                      ToJSON<E>
-                    >
-                  >
+                  Nullable<ToModel<E & EV & ParseActions<EA, ToJSON<E>>>>,
+                  ToJSON<E>
                 >
-              : ObservableArray<Nullable<D>>
-            : ObservableArray<C>
+              : ObservableArray<Nullable<FixArgType<D>>>
+            : ObservableArray<FixArgType<C>>
         : T[P];
   },
   NotNullableKeys<T>
@@ -50,15 +47,13 @@ export type ToModel<T> = Pick<
               : D extends MSSMaybeNull<infer E> // MaybeNull of Array of MaybeNull
                 ? E extends MSSModel<infer F, infer FV, infer FA> // MaybeNull of Array of MaybeNull of Model
                   ? Nullable<
-                      Nullable<
-                        ObservableArray<
-                          ToModel<F & FV & ParseActions<FA, ToJSON<F>>>,
-                          ToJSON<F>
-                        >
+                      ObservableArray<
+                        Nullable<ToModel<F & FV & ParseActions<FA, ToJSON<F>>>>,
+                        ToJSON<F>
                       >
                     >
-                  : Nullable<ObservableArray<Nullable<E>>>
-                : Nullable<ObservableArray<D>>
+                  : Nullable<ObservableArray<Nullable<FixArgType<E>>>>
+                : Nullable<ObservableArray<FixArgType<D>>>
             : Nullable<C>
         : never;
     },

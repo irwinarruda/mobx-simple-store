@@ -161,6 +161,7 @@ const MSSPerformanceTest = types
   .actions({
     setItems(items: any[]) {
       this.items = items;
+      console.log(this.testCounterArr.toJS!());
       this.testCounterArr.push({
         count1: 0,
         count2: 0,

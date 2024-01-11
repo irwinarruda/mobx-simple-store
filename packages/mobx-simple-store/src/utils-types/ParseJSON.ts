@@ -1,6 +1,7 @@
 import { MSSArray } from "@models/MSSArray";
 import { MSSMaybeNull } from "@models/MSSMaybeNull";
 import { MSSModel } from "@models/MSSModel";
+import { FixArgType } from "./FixArgType";
 import { NotNullableKeys } from "./NotNullableKeys";
 import { Nullable } from "./Nullable";
 import { NullableKeys } from "./NullableKeys";
@@ -14,8 +15,8 @@ export type ToJSON<T> = {
         : C extends MSSMaybeNull<infer D> // Array of MaybeNull
           ? D extends MSSModel<infer E, any, any> // Array of MaybeNull of Model
             ? Nullable<ToJSON<E>>[]
-            : Nullable<D>[]
-          : C[]
+            : Nullable<FixArgType<D>>[]
+          : FixArgType<C>[]
       : T[K];
 } & {
   [K in NullableKeys<T>]?: T[K] extends MSSMaybeNull<infer C> // MaybeNull
@@ -27,8 +28,8 @@ export type ToJSON<T> = {
           : D extends MSSMaybeNull<infer E> // MaybeNull of Array of MaybeNull
             ? E extends MSSModel<infer F, any, any> // MaybeNull of Array of MaybeNull of Model
               ? Nullable<Nullable<ToJSON<F>>[]>
-              : Nullable<Nullable<E>[]>
-            : Nullable<D[]>
+              : Nullable<Nullable<FixArgType<E>>[]>
+            : Nullable<FixArgType<D>[]>
         : Nullable<C>
     : never;
 };
