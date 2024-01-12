@@ -112,5 +112,6 @@ describe("toJS", () => {
     });
     const store = model.create(modelData);
     expect(store.toJS({ includeViews: true })).toStrictEqual(modelData);
+    expect(store.toJS({ includeViews: false })).not.toStrictEqual(modelData);
   });
 });
