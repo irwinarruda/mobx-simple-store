@@ -47,6 +47,9 @@ const model = types
     nullAssignNew() {
       this.mn = cast({ n: 3 });
     },
+    arrAssignNew() {
+      this.am.push({ n: 1 });
+    },
     *asyncAction() {
       this.m.n = 1000;
       yield new Promise((r) => setTimeout(r, 100));
@@ -64,7 +67,7 @@ function createModelData() {
     m: {
       n: 3,
     },
-    am: [{ n: 1 }],
+    am: [],
   };
 }
 
@@ -98,6 +101,11 @@ describe("types.model", () => {
     expect(store.m.n).toBe(6);
     expect(store.m.tripple).toBe(18);
   });
+  test("types.model's async actions must work", async () => {
+    const store = model.create(createModelData());
+    expect(await store.asyncAction()).toBeTruthy();
+    expect(store.m.n).toBe(1000);
+  });
   test("types.maybeNull(types.model) must work after assigned a new object", () => {
     const store = model.create(createModelData());
     expect(store.mn).toBeFalsy();
@@ -108,9 +116,14 @@ describe("types.model", () => {
     expect(store.mn).toHaveProperty("quad");
     expect(store.mn!.n).toBe(3);
   });
-  test("types.model's async actions must work", async () => {
+  test("types.array(types.model) must work after pushed a new object", () => {
     const store = model.create(createModelData());
-    expect(await store.asyncAction()).toBeTruthy();
-    expect(store.m.n).toBe(1000);
+    expect(store.am).toHaveLength(0);
+    store.arrAssignNew();
+    expect(store.am).toHaveLength(1);
+    expect(store.am[0]).toHaveProperty("n");
+    expect(store.am[0]).toHaveProperty("change");
+    expect(store.am[0]).toHaveProperty("quint");
+    expect(store.am[0].n).toBe(1);
   });
 });
