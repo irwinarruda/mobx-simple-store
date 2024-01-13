@@ -1,6 +1,6 @@
 {
   "name": "mobx-simple-store",
-  "version": "1.4.3",
+  "version": "1.5.0",
   "description": "Mobx Simple Store (also MSS) is a wrapper around Mobx that helps the user create a reactive state tree store with an opinionated structure and setters that can read JSON objects.",
   "author": "irwinarruda",
   "license": "MIT",
