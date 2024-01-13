@@ -133,7 +133,7 @@ const CounterStore = types
       count1: types.number,
       count2: types.number,
       countArr: types.maybeNull(types.array(types.string)),
-    })
+    }),
   )
   .views({
     get sumCount() {
@@ -186,6 +186,6 @@ This is the list of things I want to do with this libary. I don't want to go too
 - [x] add `types.frozen`
 - [ ] add `types.enum`
 - [ ] add `types.map`
-- [ ] add to models and types the `.toJSON` method to better debugg
+- [x] add to models and types the `.toJS` method to better debugg
 - [ ] add prettier and eslint to the codebase
 - [ ] compatibility with mobx-state-tre via `types.frozen`
