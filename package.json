@@ -12,6 +12,7 @@
     "mss": "pnpm -C packages/mobx-simple-store",
     "sandbox": "pnpm -C packages/sandbox",
     "dev": "concurrently \"pnpm mss dev\" \"pnpm sandbox dev\"",
+    "test": "pnpm mss test",
     "build": "pnpm mss build",
     "deploy_package": "pnpm publish packages/mobx-simple-store --no-git-checks"
   },

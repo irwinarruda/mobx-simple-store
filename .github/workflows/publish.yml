@@ -14,13 +14,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           registry-url: https://registry.npmjs.org
-          node-version: 14.18.0
+          node-version: 21.5.0
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4
+        uses: pnpm/action-setup@v2
         with:
           run_install: false
       - name: Install packages
         run: pnpm install
+      - name: Test package
+        run: pnpm test
       - name: Build package
         run: pnpm build
       - name: Publish to pnpm

@@ -181,7 +181,7 @@ For more examples, check `packages/sandbox`
 
 This is the list of things I want to do with this libary. I don't want to go too far because I know that mobx-state-tree is going to fix it's performance issues and it's a more popular and well maintained package.
 
-- [ ] add unit tests for every `type`
+- [x] add unit tests for the project
 - [x] add `types.constant`
 - [x] add `types.frozen`
 - [ ] add `types.enum`

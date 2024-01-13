@@ -23,7 +23,8 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --external mobx",
     "dev": "tsup src/index.ts --format esm,cjs --watch --dts --external mobx",
-    "test": "jest --watchAll"
+    "test": "jest",
+    "test:watch": "jest --watchAll"
   },
   "keywords": [
     "mobx",
