@@ -8,7 +8,7 @@ export type ParseActions<A, O, V> = {
     ? (...args: A) => Promise<R>
     : A[P];
 } & {
-  toJS: <I extends boolean>(args?: {
+  toJS?: <I extends boolean>(args?: {
     includeViews?: I;
   }) => ToJSON<HandleViews<O, V, I>, I>;
 };

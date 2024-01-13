@@ -150,7 +150,7 @@ const testPerformance = () => {
     countSub: { count5: 11, count6: 11 },
   });
   console.timeEnd("Normal");
-  console.log(counterStore.toJS());
+  console.log(counterStore.toJS!());
 };
 
 const MSSPerformanceTest = types

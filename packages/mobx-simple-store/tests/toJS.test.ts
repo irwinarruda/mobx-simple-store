@@ -95,9 +95,9 @@ describe("toJS", () => {
   });
   test("toJS in the root must return the sabe object as created", () => {
     const store = model.create(createModelData());
-    expect(store.toJS()).toStrictEqual(createModelData());
+    expect(store.toJS!()).toStrictEqual(createModelData());
   });
-  test("toJS in the root.foo2 must return the sabe object as created", () => {
+  test("toJS in types.array must return the sabe array as created", () => {
     const store = model.create(createModelData());
     expect(store.foo2.toJS!()).toStrictEqual(createModelData().foo2);
   });
@@ -111,7 +111,19 @@ describe("toJS", () => {
       test: 2,
     });
     const store = model.create(modelData);
-    expect(store.toJS({ includeViews: true })).toStrictEqual(modelData);
-    expect(store.toJS({ includeViews: false })).not.toStrictEqual(modelData);
+    expect(store.toJS!({ includeViews: true })).toStrictEqual(modelData);
+    expect(store.toJS!({ includeViews: false })).not.toStrictEqual(modelData);
+  });
+  test("toJS in types.array must return the same array as created with the includeViews option", () => {
+    const modelData = createModelData({
+      foo2: [{ test: "baz!!" }],
+    });
+    const store = model.create(modelData);
+    expect(store.foo2.toJS!({ includeViews: true })).toStrictEqual(
+      modelData.foo2,
+    );
+    expect(store.foo2.toJS!({ includeViews: false })).not.toStrictEqual(
+      modelData.foo2,
+    );
   });
 });
