@@ -111,9 +111,11 @@ export class MSSArray<Child> {
   }
 
   public parseReadablesToModels(readables: any[], currentPath: string) {
-    let instance =
-      (this.child as MSSModel<any, any, any>) ||
-      (this.child as MSSMaybeNull<MSSModel<any, any, any>>).child;
+    let instance = ((this.child as any).child ?? this.child) as MSSModel<
+      any,
+      any,
+      any
+    >;
     let observableValues = [];
     for (let index in readables) {
       if (isNullOrUndefined(readables[index])) {

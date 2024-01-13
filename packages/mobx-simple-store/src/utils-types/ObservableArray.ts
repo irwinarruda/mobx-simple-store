@@ -1,17 +1,27 @@
 import { HandleViews } from "./HandleViews";
-import { Or } from "./Or";
+import { Nullable } from "./Nullable";
 import { ToJSON } from "./ParseJSON";
 
-export interface ObservableArray<T, O = undefined, V = undefined>
-  extends Omit<Array<T>, "replace" | "push" | "unshift" | "splice"> {
+type HandleModel<M, P, IsNull = false> = M extends undefined
+  ? P
+  : IsNull extends true
+    ? Nullable<ToJSON<M>>
+    : ToJSON<M>;
+
+export interface ObservableArray<
+  T,
+  O = undefined,
+  V = undefined,
+  IsNull = false,
+> extends Omit<Array<T>, "replace" | "push" | "unshift" | "splice"> {
   toJS?: <I extends boolean>(args?: {
     includeViews?: I;
-  }) => Or<ToJSON<HandleViews<O, V, I>, I>, T>[];
-  push(...value: Or<ToJSON<O>, T>[]): number;
-  unshift(...value: Or<ToJSON<O>, T>[]): number;
+  }) => HandleModel<HandleViews<O, V, I>, T, IsNull>[];
+  push(...value: HandleModel<O, T, IsNull>[]): number;
+  unshift(...value: HandleModel<O, T, IsNull>[]): number;
   splice(
     start: number,
     deleteCount?: number | undefined,
-    ...value: Or<ToJSON<O>, T>[]
+    ...value: HandleModel<O, T, IsNull>[]
   ): T[];
 }

@@ -20,7 +20,8 @@ export type ToModel<T> = Pick<
               ? ObservableArray<
                   Nullable<ToModel<E & EV & ParseActions<EA, E, EV>>>,
                   E,
-                  EV
+                  EV,
+                  true
                 >
               : ObservableArray<Nullable<FixArgType<D>>>
             : ObservableArray<FixArgType<C>>
@@ -48,7 +49,8 @@ export type ToModel<T> = Pick<
                       ObservableArray<
                         Nullable<ToModel<F & FV & ParseActions<FA, F, FV>>>,
                         F,
-                        FV
+                        FV,
+                        true
                       >
                     >
                   : Nullable<ObservableArray<Nullable<FixArgType<E>>>>
