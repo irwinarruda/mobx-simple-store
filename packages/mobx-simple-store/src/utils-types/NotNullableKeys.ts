@@ -6,8 +6,8 @@ export type NotNullableKeys<T> = {
   [K in keyof T]: T[K] extends MSSModel<any, any, any>
     ? K
     : T[K] extends MSSArray<any>
-    ? K
-    : T[K] extends MSSMaybeNull<any>
-    ? never
-    : K;
+      ? K
+      : T[K] extends MSSMaybeNull<any>
+        ? never
+        : K;
 }[keyof T];
