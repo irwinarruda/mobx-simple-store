@@ -1,12 +1,10 @@
-name: Publish Package
+name: Run Tests
 
-on:
-  release:
-    types: [published]
+on: [push]
 
 jobs:
-  publish-gpr:
-    name: Publish to NPM
+  test:
+    name: Run Unit Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -25,9 +23,3 @@ jobs:
         run: pnpm install
       - name: Test package
         run: pnpm test
-      - name: Build package
-        run: pnpm build
-      - name: Publish to pnpm
-        run: pnpm deploy_package
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
