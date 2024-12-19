@@ -1,0 +1,46 @@
+name: Run Tests Two
+
+on:
+  workflow_dispatch:
+jobs:
+  update-main-app:
+    name: Update main_app with mobx-simple-store update
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          registry-url: https://registry.npmjs.org
+          node-version: 18.20.4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 7.26.1
+          run_install: false
+
+      - name: Clone main_app repository
+        run: gh repo clone irwinarruda/react-signals
+
+      - name: Update mobx-simple-store package
+        working-directory: react-signals
+        run: |
+          pnpm install
+          pnpm react-signals add mobx-simple-store@latest
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ env.GH_TOKEN }}@github.com/irwinarruda/react-signals.git
+          git checkout -b update-mobx-simple-store
+          git add .
+          git commit -m "chore: update mobx-simple-store to latest version"
+          git push origin update-mobx-simple-store
+
+      - name: Create pull request
+        working-directory: react-signals
+        run: |
+          git config --list
+          gh pr create --title "Update mobx-simple-store" --body "This PR updates mobx-simple-store to the latest version." --head update-mobx-simple-store --base main
