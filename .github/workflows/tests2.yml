@@ -1,0 +1,71 @@
+name: Run Tests Two
+
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    name: Run Unit Tests 2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          registry-url: https://registry.npmjs.org
+          node-version: 21.5.0
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+      - name: Install packages
+        run: pnpm install
+      - name: Test package
+        run: pnpm test
+
+  update-main-app:
+    name: Update main_app with mobx-simple-store update
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          registry-url: https://registry.npmjs.org
+          node-version: 18.20.4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+
+      - name: Install GitHub CLI
+        run: sudo apt-get install gh -y
+
+      - name: Authenticate GitHub CLI
+        run: echo "${{ env.NODE_AUTH_TOKEN }}" | gh auth login --with-token
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+
+      - name: Clone main_app repository
+        run: gh repo clone irwinarruda/react-signals
+
+      - name: Update mobx-simple-store package
+        working-directory: react-signals
+        run: |
+          pnpm install
+          pnpm react-signals add mobx-simple-store@latest
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b update-mobx-simple-store
+          git add package.json pnpm-lock.yaml
+          git commit -m "chore: update mobx-simple-store to latest version"
+          git push origin update-mobx-simple-store
+
+      - name: Create pull request
+        working-directory: react-signals
+        run: gh pr create --title "Update mobx-simple-store" --body "This PR updates mobx-simple-store to the latest version." --head update-mobx-simple-store --base main
