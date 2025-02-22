@@ -1,11 +1,11 @@
 import { HandleViews } from "./HandleViews";
-import { Nullable } from "./Nullable";
+import { Optional } from "./Optional";
 import { ToJSON } from "./ParseJSON";
 
 type HandleModel<M, P, IsNull = false> = M extends undefined
   ? P
   : IsNull extends true
-    ? Nullable<ToJSON<M>>
+    ? Optional<ToJSON<M>>
     : ToJSON<M>;
 
 export interface ObservableArray<

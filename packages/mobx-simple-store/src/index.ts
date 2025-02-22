@@ -1,5 +1,5 @@
 export * from "./types";
-export * from "./utils-types/Nullable";
+export * from "./utils-types/Optional";
 export * from "./utils-types/ObservableArray";
 export * from "./utils-types/ParseActions";
 export { ParseJSON } from "./utils-types/ParseJSON";

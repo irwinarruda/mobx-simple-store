@@ -1,5 +1,5 @@
 import { MSSArray } from "@models/MSSArray";
-import { MSSMaybeNull } from "@models/MSSMaybeNull";
+import { MSSOptional } from "@models/MSSOptional";
 import { MSSModel } from "@models/MSSModel";
 
 export type NotNullableKeys<T> = {
@@ -7,7 +7,7 @@ export type NotNullableKeys<T> = {
     ? K
     : T[K] extends MSSArray<any>
       ? K
-      : T[K] extends MSSMaybeNull<any>
+      : T[K] extends MSSOptional<any, any>
         ? never
         : K;
 }[keyof T];

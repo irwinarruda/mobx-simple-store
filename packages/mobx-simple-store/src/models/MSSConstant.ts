@@ -1,7 +1,7 @@
 import { SetObservableParams } from "@utils-types/SetObservableParams";
 
 export class MSSConstant {
-  public static isConstant(value: any) {
+  public static isConstant(value: any): value is MSSConstant {
     return value instanceof MSSConstant;
   }
 

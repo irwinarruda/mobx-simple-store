@@ -2,6 +2,7 @@ import { action, computed, flow, makeObservable, observable } from "mobx";
 
 import { ParseJSON } from "@utils-types/ParseJSON";
 import { ParseModel } from "@utils-types/ParseModel";
+import { ApplyObservableParams } from "@utils-types/ApplyObservableParams";
 import { SetObservableParams } from "@utils-types/SetObservableParams";
 import { hiddenKey } from "@utils/hiddenKey";
 import { isGenerator } from "@utils/isGenerator";
@@ -11,12 +12,12 @@ import { mssError } from "@utils/mssError";
 import { safeAssign } from "@utils/safeAssign";
 import { MSSArray } from "./MSSArray";
 import { MSSConstant } from "./MSSConstant";
-import { MSSMaybeNull } from "./MSSMaybeNull";
+import { MSSOptional } from "./MSSOptional";
 
 export class MSSModel<
   Observables extends object,
   Views extends object,
-  Actions extends object,
+  Actions extends object
 > {
   private currentObservables: Observables;
   private currentViews: Views;
@@ -25,7 +26,7 @@ export class MSSModel<
   constructor(
     initialObservables: Observables,
     initialViews?: Views,
-    initialActions?: Actions,
+    initialActions?: Actions
   ) {
     this.currentObservables = initialObservables;
     this.currentViews = initialViews || ({} as Views);
@@ -74,82 +75,38 @@ export class MSSModel<
 
   public create(
     initialData: ParseJSON<this>,
-    currentPath = "",
+    currentPath = ""
   ): ParseModel<this> {
     const observableData = {} as any;
     const observableOptions = {} as any;
     for (const [name, instance] of Object.entries<any>(
-      this.currentObservables as Record<string, any>,
+      this.currentObservables as Record<string, any>
     )) {
-      if (MSSMaybeNull.isMaybeNull(instance)) {
-        if (MSSModel.isModel(instance.child)) {
-          MSSModel.setObservable({
-            observableData,
-            name,
-            instance: instance.child,
-            initialValue: (initialData as any)[name],
-            isNullable: true,
-            currentPath,
-          });
-          MSSModel.setObservableOptions(observableOptions, name);
-        } else if (MSSArray.isArray(instance.child)) {
-          MSSArray.setObservable({
-            observableData,
-            name,
-            instance: instance.child,
-            initialValue: (initialData as any)[name],
-            isNullable: true,
-            currentPath,
-          });
-          MSSArray.setObservableOptions(observableOptions, name);
-        } else if (MSSConstant.isConstant(instance.child)) {
-          MSSConstant.setObservable({
-            observableData,
-            name,
-            initialValue: (initialData as any)[name],
-          });
-          MSSConstant.setObservableOptions(observableOptions, name);
-        } else {
-          observableData[name] = (initialData as any)[name];
-          observableOptions[name] = observable;
-        }
+      if (MSSOptional.isOptional(instance)) {
+        MSSModel.applyObservable({
+          observableData,
+          observableOptions,
+          name,
+          instance: instance.child,
+          initialValue: initialData[name as keyof ParseJSON<this>],
+          currentPath,
+          isNullable: true,
+        });
       } else {
-        if (isNullOrUndefined((initialData as any)[name])) {
+        if (isNullOrUndefined(initialData[name as keyof ParseJSON<this>])) {
           mssError({
             message: `Missing data for property "${name}"`,
             currentPath,
-            type: "warn",
           });
         }
-        if (MSSModel.isModel(instance)) {
-          MSSModel.setObservable({
-            observableData,
-            name,
-            instance: instance,
-            initialValue: (initialData as any)[name],
-            currentPath,
-          });
-          MSSModel.setObservableOptions(observableOptions, name);
-        } else if (MSSArray.isArray(instance)) {
-          MSSArray.setObservable({
-            observableData,
-            name,
-            instance: instance,
-            initialValue: (initialData as any)[name],
-            currentPath,
-          });
-          MSSArray.setObservableOptions(observableOptions, name);
-        } else if (MSSConstant.isConstant(instance)) {
-          MSSConstant.setObservable({
-            observableData,
-            name,
-            initialValue: (initialData as any)[name],
-          });
-          MSSConstant.setObservableOptions(observableOptions, name);
-        } else {
-          observableData[name] = (initialData as any)[name];
-          observableOptions[name] = observable;
-        }
+        MSSModel.applyObservable({
+          observableData,
+          observableOptions,
+          name,
+          instance,
+          initialValue: initialData[name as keyof ParseJSON<this>],
+          currentPath,
+        });
       }
     }
 
@@ -164,7 +121,7 @@ export class MSSModel<
 
     Object.defineProperties(
       observableData,
-      Object.getOwnPropertyDescriptors(this.currentViews),
+      Object.getOwnPropertyDescriptors(this.currentViews)
     );
     for (const key of Object.keys(this.currentViews as Record<string, any>)) {
       observableOptions[key] = computed;
@@ -185,6 +142,48 @@ export class MSSModel<
     return value instanceof MSSModel;
   }
 
+  public static applyObservable({
+    observableData,
+    observableOptions,
+    name,
+    instance,
+    initialValue,
+    currentPath,
+    isNullable = false,
+  }: ApplyObservableParams) {
+    if (MSSModel.isModel(instance)) {
+      MSSModel.setObservable({
+        observableData,
+        name,
+        instance,
+        initialValue,
+        isNullable: isNullable,
+        currentPath,
+      });
+      MSSModel.setObservableOptions(observableOptions, name);
+    } else if (MSSArray.isArray(instance)) {
+      MSSArray.setObservable({
+        observableData,
+        name,
+        instance,
+        initialValue,
+        isNullable: isNullable,
+        currentPath,
+      });
+      MSSArray.setObservableOptions(observableOptions, name);
+    } else if (MSSConstant.isConstant(instance)) {
+      MSSConstant.setObservable({
+        observableData,
+        name,
+        initialValue,
+      });
+      MSSConstant.setObservableOptions(observableOptions, name);
+    } else {
+      observableData[name] = initialValue;
+      observableOptions[name] = observable;
+    }
+  }
+
   public static setObservable({
     observableData,
     name,
@@ -201,7 +200,7 @@ export class MSSModel<
           if (isNullOrUndefined(updatedData)) {
             mssError({
               message:
-                "Cannot set undefined data. Try wrapping the model with types.maybeNull",
+                "Cannot set undefined data. Try wrapping the model with types.optional or types.maybeNull",
             });
           }
           this[hiddenKey(name)]._hydrate(updatedData);

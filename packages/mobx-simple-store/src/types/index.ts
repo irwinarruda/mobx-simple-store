@@ -4,6 +4,7 @@ import { constant } from "./constant";
 import { frozen } from "./frozen";
 import { maybeNull } from "./maybeNull";
 import { model } from "./model";
+import { optional } from "./optional";
 
 export const types = {
   string: String(),
@@ -16,4 +17,5 @@ export const types = {
   compose,
   maybeNull,
   model,
+  optional,
 };

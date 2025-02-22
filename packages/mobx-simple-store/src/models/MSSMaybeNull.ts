@@ -12,14 +12,14 @@ export class MSSMaybeNull<Child> {
   }
 
   public static isMaybeNullWithArray(value: any) {
-    return value instanceof MSSMaybeNull && MSSArray.isArray(value.child);
+    return this.isMaybeNull(value) && MSSArray.isArray(value.child);
   }
 
   public static isMaybeNullWithModel(value: any) {
-    return value instanceof MSSMaybeNull && MSSModel.isModel(value.child);
+    return this.isMaybeNull(value) && MSSModel.isModel(value.child);
   }
 
   public static isMaybeNullWithMaybeNull(value: any) {
-    return value instanceof MSSMaybeNull && this.isMaybeNull(value.child);
+    return this.isMaybeNull(value) && this.isMaybeNull(value.child);
   }
 }

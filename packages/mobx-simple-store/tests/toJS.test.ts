@@ -18,7 +18,19 @@ const model = types
             return this.baz + "!";
           },
         })
-        .actions({ runTest() {} }),
+        .actions({ runTest() {} })
+    ),
+    bar3: types.optional(
+      types
+        .model({
+          baz: types.string,
+        })
+        .views({
+          get test() {
+            return this.baz + "!";
+          },
+        })
+        .actions({ runTest() {} })
     ),
     foo1: types.array(types.string),
     foo2: types.array(
@@ -32,7 +44,7 @@ const model = types
             return this.baz + "!!";
           },
         })
-        .actions({ runTest() {} }),
+        .actions({ runTest() {} })
     ),
     foo3: types.maybeNull(
       types.array(
@@ -43,8 +55,20 @@ const model = types
               return this.baz + "!";
             },
           })
-          .actions({ runTest() {} }),
-      ),
+          .actions({ runTest() {} })
+      )
+    ),
+    foo4: types.optional(
+      types.array(
+        types
+          .model({ baz: types.string })
+          .views({
+            get test() {
+              return this.baz + "!";
+            },
+          })
+          .actions({ runTest() {} })
+      )
     ),
   })
   .views({
@@ -58,6 +82,7 @@ function createModelData(addition?: any) {
     ...addition,
     bar1: { baz: "baz", ...addition?.bar1 },
     bar2: { baz: "baz", ...addition?.bar2 },
+    bar3: { baz: "bar3", ...addition?.bar3 },
     foo1: ["foo1", ...(addition?.foo1 ?? [])],
     foo2: [
       {
@@ -67,6 +92,7 @@ function createModelData(addition?: any) {
       },
     ],
     foo3: [{ baz: "baz", ...addition?.foo3?.[0] }],
+    foo4: [{ baz: "foo4", ...addition?.foo4?.[0] }],
   };
 }
 
@@ -93,6 +119,11 @@ describe("toJS", () => {
     expect(store.bar2).toHaveProperty("toJS");
     expect(store.foo3).toHaveProperty("toJS");
   });
+  test("toJS must be defined in types.optional's children (Model or Array)", () => {
+    const store = model.create(createModelData());
+    expect(store.bar3).toHaveProperty("toJS");
+    expect(store.foo4).toHaveProperty("toJS");
+  });
   test("toJS in the root must return the sabe object as created", () => {
     const store = model.create(createModelData());
     expect(store.toJS!()).toStrictEqual(createModelData());
@@ -105,9 +136,11 @@ describe("toJS", () => {
     const modelData = createModelData({
       bar1: { test: "baz!" },
       bar2: { test: "baz!" },
+      bar3: { test: "bar3!" },
       foo1: ["any"],
       foo2: [{ test: "baz!!" }],
       foo3: [{ test: "baz!" }],
+      foo4: [{ test: "foo4!" }],
       test: 2,
     });
     const store = model.create(modelData);
@@ -120,10 +153,10 @@ describe("toJS", () => {
     });
     const store = model.create(modelData);
     expect(store.foo2.toJS!({ includeViews: true })).toStrictEqual(
-      modelData.foo2,
+      modelData.foo2
     );
     expect(store.foo2.toJS!({ includeViews: false })).not.toStrictEqual(
-      modelData.foo2,
+      modelData.foo2
     );
   });
 });

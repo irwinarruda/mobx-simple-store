@@ -23,17 +23,31 @@ const model = types
           get quad() {
             return this.n * 4;
           },
-        }),
+        })
+    ),
+    mo: types.optional(
+      types
+        .model({ n: types.number })
+        .actions({
+          change() {
+            this.n += 1;
+          },
+        })
+        .views({
+          get quint() {
+            return this.n * 5;
+          },
+        })
     ),
     am: types.array(
       types
         .model({ n: types.number })
         .actions({ change() {} })
         .views({
-          get quint() {
-            return this.n * 5;
+          get timesSix() {
+            return this.n * 6;
           },
-        }),
+        })
     ),
   })
   .actions({
@@ -46,6 +60,9 @@ const model = types
     },
     nullAssignNew() {
       this.mn = cast({ n: 3 });
+    },
+    optionalAssignNew() {
+      this.mo = cast({ n: 3 });
     },
     arrAssignNew() {
       this.am.push({ n: 1 });
@@ -116,6 +133,16 @@ describe("types.model", () => {
     expect(store.mn).toHaveProperty("quad");
     expect(store.mn!.n).toBe(3);
   });
+  test("types.optional(types.model) must work with default and be assignable", () => {
+    const store = model.create(createModelData());
+    expect(store.mo).toBeFalsy();
+    store.optionalAssignNew();
+    expect(store.mo).not.toBeFalsy();
+    expect(store.mo).toHaveProperty("n");
+    expect(store.mo).toHaveProperty("change");
+    expect(store.mo).toHaveProperty("quint");
+    expect(store.mo!.n).toBe(3);
+  });
   test("types.array(types.model) must work after pushed a new object", () => {
     const store = model.create(createModelData());
     expect(store.am).toHaveLength(0);
@@ -123,7 +150,7 @@ describe("types.model", () => {
     expect(store.am).toHaveLength(1);
     expect(store.am[0]).toHaveProperty("n");
     expect(store.am[0]).toHaveProperty("change");
-    expect(store.am[0]).toHaveProperty("quint");
+    expect(store.am[0]).toHaveProperty("timesSix");
     expect(store.am[0].n).toBe(1);
   });
 });

@@ -1,5 +1,5 @@
-import { MSSMaybeNull } from "@models/MSSMaybeNull";
+import { MSSOptional } from "@models/MSSOptional";
 
 export function maybeNull<T>(child: T) {
-  return new MSSMaybeNull(child);
+  return new MSSOptional(child, true);
 }

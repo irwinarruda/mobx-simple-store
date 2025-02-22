@@ -5,7 +5,7 @@ import { hiddenKey } from "@utils/hiddenKey";
 import { isNullOrUndefined } from "@utils/isNullOrUndefined";
 import { joinPaths } from "@utils/joinPaths";
 import { mssError } from "@utils/mssError";
-import { MSSMaybeNull } from "./MSSMaybeNull";
+import { MSSOptional } from "./MSSOptional";
 import { MSSModel } from "./MSSModel";
 
 export class MSSArray<Child> {
@@ -17,12 +17,12 @@ export class MSSArray<Child> {
 
   public validateChild(child: Child) {
     if (
-      MSSMaybeNull.isMaybeNullWithArray(child) ||
-      MSSMaybeNull.isMaybeNullWithMaybeNull(child)
+      MSSOptional.isOptionalWithArray(child) ||
+      MSSOptional.isOptionalWithOptional(child)
     ) {
+      const type = !!child.includeNull ? "types.maybeNull" : "types.optional";
       mssError({
-        message:
-          "types.array cannot have a child types.maybeNull that has a child types.maybeNull or types.array",
+        message: `types.array cannot have a child ${type} that has a child ${type} or types.array`,
       });
     }
     if (MSSArray.isArray(child)) {
@@ -33,7 +33,7 @@ export class MSSArray<Child> {
   create(initialData: Child[], currentPath = "") {
     if (
       MSSModel.isModel(this.child) ||
-      MSSMaybeNull.isMaybeNullWithModel(this.child)
+      MSSOptional.isOptionalWithModel(this.child)
     ) {
       return this.createProxiedModelArray(initialData, currentPath);
     }
@@ -46,7 +46,7 @@ export class MSSArray<Child> {
           for (let item of this) arr.push(item);
           return arr;
         },
-      },
+      }
     );
   }
 
@@ -62,7 +62,7 @@ export class MSSArray<Child> {
               const arr = [];
               for (let item of target)
                 arr.push(
-                  !isNullOrUndefined(item?.toJS) ? item.toJS(args) : item,
+                  !isNullOrUndefined(item?.toJS) ? item.toJS(args) : item
                 );
               return arr;
             };
@@ -74,7 +74,7 @@ export class MSSArray<Child> {
           if (prop === "unshift") {
             return (...value: any) =>
               target.unshift(
-                ...this.parseReadablesToModels(value, currentPath),
+                ...this.parseReadablesToModels(value, currentPath)
               );
           }
           if (prop === "push") {
@@ -90,7 +90,7 @@ export class MSSArray<Child> {
               target.splice(
                 start,
                 deleteCount,
-                ...this.parseReadablesToModels(value, currentPath),
+                ...this.parseReadablesToModels(value, currentPath)
               );
           }
           return target[prop];
@@ -101,12 +101,12 @@ export class MSSArray<Child> {
           } else {
             target[prop] = (this.child as MSSModel<any, any, any>).create(
               value,
-              currentPath,
+              currentPath
             );
           }
           return value;
         },
-      },
+      }
     );
   }
 
@@ -122,7 +122,7 @@ export class MSSArray<Child> {
         observableValues.push(undefined);
       } else {
         observableValues.push(
-          instance.create(readables[index], joinPaths(currentPath, index)),
+          instance.create(readables[index], joinPaths(currentPath, index))
         );
       }
     }
@@ -148,7 +148,8 @@ export class MSSArray<Child> {
         set(updatedData) {
           if (isNullOrUndefined(updatedData)) {
             mssError({
-              message: `Cannot set undefined data. Try wrapping the model with types.maybeNull`,
+              message:
+                "Cannot set undefined data. Try wrapping the model with types.optional or types.maybeNull",
             });
           }
           this[hiddenKey(name)].replace(updatedData);
